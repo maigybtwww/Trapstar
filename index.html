@@ -168,7 +168,7 @@
             commandInput.value = ""; 
             let parts = command.split(" ");
             if (parts.length < 2 || parts.length > 3) {
-                document.getElementById("output").innerText = "Ungültiger Befehl! Nutze: /bonus (Benutzer) (Betrag), /remove (Benutzer) (Betrag), /delete (Benutzer) oder /remove *";
+                document.getElementById("output").innerText = "Ungültiger Befehl! Nutze: /bonus (Benutzer) (Betrag), /remove (Benutzer) (Betrag), /del (Benutzer) oder /remove *";
                 return;
             }
 
@@ -197,7 +197,7 @@
                     outputMessage = "Ungültiger Befehl! Nutze: /remove (Benutzer) (Betrag) oder /remove *";
                     return;
                 }
-            } else if (cmd === "/delete") {
+            } else if (cmd === "/del") {
                 if (balance[user]) {
                     delete balance[user];
                     outputMessage = `Benutzer ${user} wurde entfernt.`;
