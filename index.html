@@ -141,6 +141,31 @@
             margin-bottom: 20px;
             color: #333;
         }
+
+        .copy-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .copy-button:hover {
+            background-color: #0b7dda;
+        }
+
+        .copy-success {
+            color: #4CAF50;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .copy-success.visible {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -171,10 +196,12 @@
                 <h2>Kontostände</h2>
                 <ul id="balanceList"></ul>
                 <div id="totalAmount"></div>
+                <button class="copy-button" onclick="copyBalancesToClipboard()">Kontostände kopieren</button>
+                <div id="copySuccess" class="copy-success">In die Zwischenablage kopiert!</div>
 
                 <div class="config-panel" id="configPanel">
                     <h3>Füge schnell Auszahlungen hinzu</h3>
-                    <textarea id="batchInput" class="config-input" rows="10" placeholder="Z.B. Aykut: 855000€"></textarea>
+                    <textarea id="batchInput" class="config-input" rows="10" placeholder="Z.B. Name: 855000€"></textarea>
                     <button onclick="processBatchInput()">Daten einfügen</button>
                 </div>
             </div>
@@ -547,6 +574,44 @@
         // Formatierfunktion für Zahlen
         function formatNumber(amount) {
             return amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');      
+        }
+
+        // Neue Funktion: Kontostände in die Zwischenablage kopieren
+        function copyBalancesToClipboard() {
+            // Konvertiere Balance-Objekt in ein Array und sortiere es absteigend
+            const sortedBalances = Object.entries(balance)
+                .sort((a, b) => b[1] - a[1]);
+            
+            // Erstelle formatierte Liste für die Zwischenablage
+            let clipboardText = '';
+            
+            sortedBalances.forEach(([user, amount]) => {
+                clipboardText += `* ${user}: ${formatNumber(amount)}\n`;
+            });
+            
+            // Füge Gesamtbetrag hinzu
+            const total = Object.values(balance).reduce((sum, amount) => sum + amount, 0);
+            clipboardText += `**Gesamtbetrag: ${formatNumber(total)}€**`;
+            
+            // Kopiere den Text in die Zwischenablage
+            navigator.clipboard.writeText(clipboardText).then(() => {
+                // Zeige Erfolgsmeldung an
+                const copySuccess = document.getElementById("copySuccess");
+                copySuccess.classList.add("visible");
+                
+                // Blende die Meldung nach 2 Sekunden wieder aus
+                setTimeout(() => {
+                    copySuccess.classList.remove("visible");
+                }, 2000);
+                
+                console.log("Kontostände in Zwischenablage kopiert");
+            }).catch(err => {
+                console.error("Fehler beim Kopieren in die Zwischenablage:", err);
+                alert("Kopieren fehlgeschlagen. Bitte manuell kopieren.");
+            });
+            
+            // Die Zeilen zum Hinzufügen eines Eintrags zum Verlauf wurden entfernt
+            // Daher wird das Kopieren nicht mehr im Verlauf angezeigt
         }
 
         // Echtzeit-Aktualisierung der gemeinsamen Daten
